@@ -9,9 +9,9 @@ Using the script is simple, if a bit awkward (due to Photoshop's unfortunate lim
 * **Spacing vary** is the amount of variance you want in the spacing, 0 being no variation at all.
 * **Baseline vary** is the amount of variance you want between each character and the text baseline, 0 being no variation at all.
 
-The script will remember the settings, so the next time you run it, the input box should automatically contain the previous set of values you enterred.
+The script should remember the settings, so the next time you run it, the input box should automatically contain the previous set of values you enterred.
 
-Ideally, there would be an interface in Photoshop that would just have these values as sliders, and you could play with them until you got the result you wanted. Unfortunately, as far as I was able to determine, Photoshop does not allow scripts to create permanent UI windows in the way that would be necessary for this to work. If anyone has any ideas on how to get around that limitation (without creating a full-blown plugin), please submit a pull request.
+Ideally, there would be an interface in Photoshop that would just have these values as sliders, and you could play with them until you got the result you wanted. Furthermore, it would be great if you could store and recall presets. These would not be difficult features to add. However, unfortunately Photoshop does not seem to allow scripts to create real UI windows in the way that would be necessary for this to work. If anyone has any ideas on how to get around that limitation (without creating a full-blown plugin), please submit an issue or a pull request with how it could be done.
 
 Happy drawing,
 
