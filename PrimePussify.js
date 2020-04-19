@@ -49,24 +49,61 @@ function prime_puss(OrigSize, SizeVariance, OrigTracking, TrackVariance, Baselin
     executeAction(stringIDToTypeID("set"), d, DialogModes.NO);
 }
 
+function MakeSlider ( parent, name, defaultValue, minValue, maxValue )
+{
+    var group = parent.add ( "group" );
+    group.alignment = "left";
+
+    var label = group.add ( "statictext", [0,0,110,30], name);
+    var slider = group.add ("slider", [0,0,200,10], defaultValue);
+    slider.minvalue = minValue;
+    slider.maxvalue = maxValue;
+    slider.value = defaultValue;
+
+    var value = group.add ( "statictext", [0,0,35,30], defaultValue, { alignment: "right" });
+    value.justify = "right";
+    slider.onChanging = function() { value.text = slider.value.toFixed(1).split(".0")[0]; }; // Javascript is an abomination
+
+    return slider;
+}
+
 var PrevPuss = "11, 0, 25, 0, 0";
 var SettingsName = "PrimePuss";
 var ValueName = "SizeBase";
+
 try
 {
-    PrevPuss = app.getCustomOptions(SettingsName).getString(app.stringIDToTypeID(ValueName));
+    var fontSize = 48;
+    try
+    {
+        var tLayer = activeDocument.activeLayer;
+        fontSize = tLayer.textItem.size.value;
+    }catch(e)
+    {
+        alert(e);
+    }
+
+    var uiWindow = new Window ("dialog", "Prime Pussify");
+    var size = MakeSlider(uiWindow, "Size", fontSize, 1, 512 );
+    var sizeVariance = MakeSlider(uiWindow, "Size Variance", 0, -12, 12 );
+    var spacing = MakeSlider(uiWindow, "Spacing", 4, -16, 16 );
+    var spacingVariance = MakeSlider(uiWindow, "Spacing Variance", 1, -32, 32 );
+    var baselineVariance = MakeSlider(uiWindow, "Baseline Variance", 3, 10, 64 );
+
+    var buttons = uiWindow.add("group");
+    var okBtn = buttons.add( "button", undefined, "Ok");
+    var cancelBtn = buttons.add( "button", undefined, "Cancel");
+    
+    if ( uiWindow.show () == 1 )
+    {
+        var values = [size.value, sizeVariance.value, spacing.value, spacingVariance.value, baselineVariance.value];
+        PrevPuss = values.join ( ", ")
+        prime_puss.apply ( null, values );
+    }
+
 }
 catch(err)
 {
+    alert(err);
 }
 
-var S = prompt("Enter the variance in points as [size, size vary, spacing, spacing vary, baseline vary]:", PrevPuss);
-if(S)
-{
-    var d0 = new ActionDescriptor();
-    d0.putString(stringIDToTypeID(ValueName), S);
-    app.putCustomOptions(SettingsName, d0, true);
-
-     var p = S.split(',');
-    prime_puss(parseFloat(p[0]), parseFloat(p[1]), parseFloat(p[2]), parseFloat(p[3]), parseFloat(p[4]));
-}
