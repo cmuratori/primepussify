@@ -47,6 +47,7 @@ function prime_puss(OrigSize, SizeVariance, OrigTracking, TrackVariance, Baselin
     d1.putList(stringIDToTypeID("textStyleRange"), list1);
     d.putObject(stringIDToTypeID("to"), stringIDToTypeID("textLayer"), d1);
     executeAction(stringIDToTypeID("set"), d, DialogModes.NO);
+    refresh();
 }
 
 function MakeSlider ( parent, name, defaultValue, minValue, maxValue )
@@ -60,7 +61,7 @@ function MakeSlider ( parent, name, defaultValue, minValue, maxValue )
     slider.maxvalue = maxValue;
     slider.value = defaultValue;
 
-    var value = group.add ( "statictext", [0,0,35,30], defaultValue, { alignment: "right" });
+    var value = group.add ( "statictext", [0,0,35,30], defaultValue.toFixed(1).split(".0")[0], { alignment: "right" });
     value.justify = "right";
     slider.onChanging = function() { value.text = slider.value.toFixed(1).split(".0")[0]; }; // Javascript is an abomination
 
@@ -73,32 +74,54 @@ var ValueName = "SizeBase";
 
 try
 {
-    var fontSize = 48;
-    try
+    if ( !activeDocument.activeLayer || !activeDocument.activeLayer.textItem )
     {
-        var tLayer = activeDocument.activeLayer;
-        fontSize = tLayer.textItem.size.value;
-    }catch(e)
+        alert ( "Selected layer isn't a text layer");
+    }else
     {
-        alert(e);
-    }
+        var historyBeforePussification = app.activeDocument.activeHistoryState;
+        var fontSize = 48;
+        try
+        {
+            var tLayer = activeDocument.activeLayer;
+            fontSize = tLayer.textItem.size.value;
+        }catch(e)
+        {
+            alert(e);
+        }
 
-    var uiWindow = new Window ("dialog", "Prime Pussify");
-    var size = MakeSlider(uiWindow, "Size", fontSize, 1, 512 );
-    var sizeVariance = MakeSlider(uiWindow, "Size Variance", 0, -12, 12 );
-    var spacing = MakeSlider(uiWindow, "Spacing", 4, -16, 16 );
-    var spacingVariance = MakeSlider(uiWindow, "Spacing Variance", 1, -32, 32 );
-    var baselineVariance = MakeSlider(uiWindow, "Baseline Variance", 3, 10, 64 );
+        var uiWindow = new Window ("dialog", "Prime Pussify");
+        var size = MakeSlider(uiWindow, "Size", fontSize, 1, 512 );
+        var sizeVariance = MakeSlider(uiWindow, "Size Variance", 0, 0, 128 );
+        var spacing = MakeSlider(uiWindow, "Spacing", 0, -64, 64 );
+        var spacingVariance = MakeSlider(uiWindow, "Spacing Variance", 1, -64, 64 );
+        var baselineVariance = MakeSlider(uiWindow, "Baseline Variance", 0, 0, 512 );
 
-    var buttons = uiWindow.add("group");
-    var okBtn = buttons.add( "button", undefined, "Ok");
-    var cancelBtn = buttons.add( "button", undefined, "Cancel");
-    
-    if ( uiWindow.show () == 1 )
-    {
-        var values = [size.value, sizeVariance.value, spacing.value, spacingVariance.value, baselineVariance.value];
-        PrevPuss = values.join ( ", ")
-        prime_puss.apply ( null, values );
+        var performPussification = function()
+        {
+            var values = [size.value, sizeVariance.value, spacing.value, spacingVariance.value, baselineVariance.value];
+            PrevPuss = values.join ( ", ")
+            prime_puss.apply ( null, values );
+        };
+
+        size.onChange = performPussification;
+        sizeVariance.onChange = performPussification;
+        spacing.onChange = performPussification;
+        spacingVariance.onChange = performPussification;
+        baselineVariance.onChange = performPussification;
+        
+        var buttons = uiWindow.add("group");
+        var okBtn = buttons.add("button", undefined, "Ok");
+        var cancelBtn = buttons.add( "button", undefined, "Cancel");
+            
+        uiWindow.center();    
+        if ( uiWindow.show() == 1 ) // Ok
+        {
+            
+        }else // Cancel
+        {
+            app.activeDocument.activeHistoryState = historyBeforePussification;
+        }
     }
 
 }
