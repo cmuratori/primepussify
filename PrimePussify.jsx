@@ -84,10 +84,10 @@ function init() {
     slider.addEventListener("changing", function () {
       textValue.text = formatNumber(this.value, precision);
     });
-    slider.addEventListener("change", performPussification);
+    slider.addEventListener("change", pussify);
     function updateSlider() {
       slider.value = Number(this.text);
-      performPussification();
+      pussify();
     }
 
     // Slider input field value
@@ -118,15 +118,14 @@ function init() {
     return Math.round(Number(n).toFixed(precision || 0) * 100) / 100;
   }
 
-  function performPussification() {
-    var values = [
+  function pussify() {
+    prime_puss(
       sizeSlider.value,
       sizeVarianceSlider.value,
       trackSlider.value,
       trackVarianceSlider.value,
       baselineVarianceSlider.value
-    ];
-    prime_puss.apply(null, values);
+    );
   }
 
   function storeValues() {
